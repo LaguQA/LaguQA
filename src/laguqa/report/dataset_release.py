@@ -38,7 +38,10 @@ from laguqa.paths import ABC_DIR, BENCHMARK_DIR, CSV_PATH, DATA_DIR, REPO_ROOT
 
 csv.field_size_limit(10**8)
 
-CARD = """---
+#: Kartu bahasa Inggris. Berkas inilah yang ditampilkan Hugging Face di halaman
+#: dataset, jadi hanya berkas ini yang memuat metadata YAML. Medan `language: id`
+#: menerangkan bahasa datanya, bukan bahasa kartunya.
+CARD_EN = """---
 license: cc-by-nc-4.0
 language:
   - id
@@ -54,6 +57,130 @@ size_categories:
 
 # LaguQA
 
+A benchmark for what a language model knows about {n_songs} Indonesian regional
+and national songs. Every one was transcribed by hand from a printed songbook
+into ABC 2.1 notation, and every value traces back to a specific page.
+
+The questions cover bibliographic facts such as composer and region of origin,
+and reasoning over the notation. Some show a fragment of number notation and ask
+which song it is. Others ask the model to count bars or name the highest note.
+Number notation is how music is taught across Indonesia, and no benchmark the
+author could find tests whether a model can read it.
+
+Part of an undergraduate thesis in Informatics, Universitas Ahmad Dahlan.
+
+[Baca dalam bahasa Indonesia](README.id.md)
+
+| | |
+|---|---|
+| Code | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
+| Demo | [IRedDragonICY/LaguQA-Demo](https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo) |
+| Model | [IRedDragonICY/LaguQA-Gemma4-E2B](https://huggingface.co/IRedDragonICY/LaguQA-Gemma4-E2B) |
+| Mirror | [kaggle.com/datasets/ireddragonicy/laguqa](https://www.kaggle.com/datasets/ireddragonicy/laguqa) |
+
+The demo draws and plays each song's notation from the ABC files in this
+repository, so what a visitor hears is the same material the notation questions
+are keyed against.
+
+## Contents
+
+| file | rows | contents |
+|---|---|---|
+{files_table_en}
+
+There are {n_categories} question categories, from metadata facts to reasoning
+over notation.
+
+## Score floor
+
+Accuracy on this benchmark means nothing measured against zero. The book is
+dominated by 4/4 time and the key of Do = C, so a guesser that always answers
+the most common value already collects most of the metadata questions without
+knowing a single song.
+
+The two test files have separate floors, and the numbers are not
+interchangeable, because the questions differ.
+
+| control | `laguqa_test_split37` | `laguqa_test` |
+|---|---|---|
+| always the most common answer | **26.9%** | **33.6%** |
+| random within the same category | 24.3% | 28.6% |
+| answering nothing at all | 0.0% | 0.0% |
+
+The numbers are lenient. All three can be regenerated with
+`scripts/17_controls.py` and are scored by the same scorer used on real models.
+For comparison, Gemma-4-E2B without training scores 19.6% on `split37`, below a
+guesser that knows no song at all.
+
+## Contamination check
+
+The multiple-choice file carries a canary string on its first line. A model that
+can reproduce that string was trained on this file, which invalidates its score.
+A canary stays useful after the data is public.
+
+## Limitations
+
+- **{n_meter_inferred} songs have an inferred time signature rather than a
+  printed one.** Pages in the `1 = C` style print no time signature. The
+  `time_signature_source` column marks them, and no time-signature question is
+  generated from those songs.
+- **{n_raw} ABC files are unverified**, so notation-reasoning questions reach
+  only {n_verified} songs.
+- **Composer is filled for {n_composer} of {n_songs} rows, region of origin for
+  {n_origin} of {n_songs}.** The book names a composer for national songs and a
+  region for regional ones, almost never both. Those gaps are not missing data.
+  The correct answer for such a row is that the book does not state it, and
+  abstention questions exist to test exactly that.
+- **Eighteen words in the lyrics are still joined wrongly**, because one
+  syllable was transcribed capitalised, as in `IndoNesia`. The lyric keys for
+  those words carry the wrong spelling, so a model that gets them right is
+  marked wrong. The list is in `docs/lirik-perlu-dicek.md`.
+- **Two songs share a title.** The book contains two different songs called
+  "Desaku", with different melodies and composers. The `title_unique` column
+  separates them, and is used only when a question has to say which one it
+  means.
+
+`SOURCE.md`, included here, has the details.
+
+## Licence
+
+The metadata and transcriptions here are released under CC BY-NC 4.0. The source
+book remains fully copyrighted and its scans are not included. Indonesian Law
+28/2014 Article 44 permits quotation for research and education as long as the
+source is named, and what is published here is designed to stay within that.
+
+Two different layers of rights apply. The book is a compilation: what its
+publisher holds is the selection and arrangement of the contents, along with the
+page layout. Each song inside has its own rights status, separate from the book.
+That is why page scans are never published, while lyrics and melodies are
+treated according to each song's status.
+
+The `rights_class` column records the class of each song, and `HAK-CIPTA.md`
+explains the basis along with how to file an objection. That file lays out the
+reasoning behind the classification. It is not legal advice, and it is not a
+claim that everything in this dataset is free to use.
+
+## Citation
+
+Citing this dataset requires citing the source book as well.
+
+```bibtex
+@book{{pustakabaru2025,
+  author    = {{{{Tim Pustaka Baru}}}},
+  title     = {{Koleksi Lengkap Lagu-Lagu Daerah \\& Wajib Nasional}},
+  publisher = {{Pustaka Baru Press}},
+  address   = {{Banguntapan, Bantul, Yogyakarta}},
+  year      = {{2025}},
+  isbn      = {{978-602-0874-22-7}},
+  pages     = {{192}}
+}}
+```
+"""
+
+#: Kartu bahasa Indonesia. Tanpa metadata YAML karena Hugging Face hanya membaca
+#: metadata dari README.md.
+CARD_ID = """# LaguQA
+
 Benchmark untuk menguji apa yang model bahasa tahu tentang {n_songs} lagu daerah
 dan wajib nasional Indonesia. Seluruhnya ditranskripsi tangan dari satu buku
 cetak ke notasi ABC 2.1, dan tiap nilai bisa ditelusuri ke satu halaman buku.
@@ -67,11 +194,13 @@ Indonesia, sedangkan tolok ukur yang menguji pembacaannya belum penulis temukan.
 Bagian dari penelitian skripsi Program Studi Informatika, Universitas Ahmad
 Dahlan.
 
+[Read this in English](README.md)
+
 | | |
 |---|---|
+| Kode | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Demo | [IRedDragonICY/LaguQA-Demo](https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo) |
 | Model | [IRedDragonICY/LaguQA-Gemma4-E2B](https://huggingface.co/IRedDragonICY/LaguQA-Gemma4-E2B) |
-| Dataset | [IRedDragonICY/LaguQA](https://huggingface.co/datasets/IRedDragonICY/LaguQA) |
 | Cermin | [kaggle.com/datasets/ireddragonicy/laguqa](https://www.kaggle.com/datasets/ireddragonicy/laguqa) |
 
 Demonya menggambar dan membunyikan notasi tiap lagu dari berkas ABC di
@@ -192,6 +321,21 @@ DESCRIBE = {
     "daftar-isi.csv": "daftar isi buku, untuk memeriksa nomor halaman",
     "laguqa_manifest.json": "SHA-256 keempat berkas terbuka",
     "laguqa_mc_manifest.json": "SHA-256 berkas pilihan ganda",
+}
+
+DESCRIBE_EN = {
+    "laguqa.csv": "the main table, one row per song",
+    "laguqa_train.jsonl": "training, all 107 songs (used for the released model)",
+    "laguqa_test.jsonl": "test, full-regime pairs",
+    "laguqa_train_split70.jsonl": "training, 70 songs (used for the experiments)",
+    "laguqa_test_split37.jsonl": "test, 37 songs never trained on",
+    "laguqa_mc.jsonl": ("multiple choice A-E, random guessing floor 20%; 25% in "
+                        "the time-signature category, where one option is a "
+                        "signature the book never uses"),
+    "split.json": "the frozen 70/37 split",
+    "daftar-isi.csv": "the book's table of contents, for checking page numbers",
+    "laguqa_manifest.json": "SHA-256 of the four open files",
+    "laguqa_mc_manifest.json": "SHA-256 of the multiple-choice file",
 }
 
 
@@ -338,17 +482,19 @@ def main(argv: list[str] | None = None) -> int:
     status = Counter(s["abc_status"] for s in songs)
     n_verified = status.get("terverifikasi", 0)
 
-    rows = []
+    rows, rows_en = [], []
     for p in present:
         n = records_in(p)
-        rows.append(f"| `{p.name}` | {n if n > 1 else ''} | "
-                    f"{DESCRIBE.get(p.name, '')} |")
+        jumlah = n if n > 1 else ""
+        rows.append(f"| `{p.name}` | {jumlah} | {DESCRIBE.get(p.name, '')} |")
+        rows_en.append(f"| `{p.name}` | {jumlah} | {DESCRIBE_EN.get(p.name, '')} |")
     rows.append(f"| `abc/` | {len(abc_files)} | transkripsi ABC 2.1, satu berkas satu lagu |")
     rows.append("| `SOURCE.md` | | asal data, cara verifikasi, dan batasannya |")
+    rows_en.append(f"| `abc/` | {len(abc_files)} | ABC 2.1 transcriptions, one file per song |")
+    rows_en.append("| `SOURCE.md` | | where the data comes from, how it was verified, and its limits |")
 
-    card = CARD.format(
+    angka = dict(
         n_songs=len(songs),
-        files_table="\n".join(rows),
         n_categories=len({x["kategori"] for x in (
             json.loads(l) for l in
             (BENCHMARK_DIR / "laguqa_test_split37.jsonl").read_text(
@@ -360,12 +506,16 @@ def main(argv: list[str] | None = None) -> int:
         n_composer=sum(1 for s in songs if s["composer"].strip() not in {"", "-"}),
         n_origin=sum(1 for s in songs if s["origin"].strip() not in {"", "-"}),
     )
+    card = CARD_EN.format(files_table_en="\n".join(rows_en), **angka)
+    card_id = CARD_ID.format(files_table="\n".join(rows), **angka)
 
     print(f"\n{len(present)} berkas data + {len(abc_files)} berkas ABC")
     if not args.apply:
         print(f"\npratinjau. tambahkan --apply untuk menulis ke {args.out}/")
         print("\n--- README.md ---")
         print(card[:1400])
+        print("\n--- README.id.md ---")
+        print(card_id[:600])
         return 0
 
     out = args.out
@@ -392,6 +542,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest["HAK-CIPTA.md"] = sha256(out / "HAK-CIPTA.md")
 
     (out / "README.md").write_text(card, encoding="utf-8")
+    (out / "README.id.md").write_text(card_id, encoding="utf-8")
     (out / "manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
 
