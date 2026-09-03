@@ -16,6 +16,7 @@ Universitas Ahmad Dahlan.
 
 | | |
 |---|---|
+| Situs | [laguqa.github.io](https://laguqa.github.io) |
 | Kode | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Dataset | [IRedDragonICY/LaguQA](https://huggingface.co/datasets/IRedDragonICY/LaguQA) |
 | Cermin dataset | [kaggle.com/datasets/ireddragonicy/laguqa](https://www.kaggle.com/datasets/ireddragonicy/laguqa) |

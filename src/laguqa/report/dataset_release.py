@@ -73,6 +73,7 @@ Part of an undergraduate thesis in Informatics, Universitas Ahmad Dahlan.
 
 | | |
 |---|---|
+| Website | [laguqa.github.io](https://laguqa.github.io) |
 | Code | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Demo | [IRedDragonICY/LaguQA-Demo](https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo) |
 | Model | [IRedDragonICY/LaguQA-Gemma4-E2B](https://huggingface.co/IRedDragonICY/LaguQA-Gemma4-E2B) |
@@ -198,6 +199,7 @@ Dahlan.
 
 | | |
 |---|---|
+| Situs | [laguqa.github.io](https://laguqa.github.io) |
 | Kode | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Demo | [IRedDragonICY/LaguQA-Demo](https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo) |
 | Model | [IRedDragonICY/LaguQA-Gemma4-E2B](https://huggingface.co/IRedDragonICY/LaguQA-Gemma4-E2B) |

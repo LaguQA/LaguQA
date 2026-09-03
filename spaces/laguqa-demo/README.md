@@ -30,6 +30,7 @@ Dahlan.
 
 | | |
 |---|---|
+| Website | [laguqa.github.io](https://laguqa.github.io) |
 | Code | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Dataset | [IRedDragonICY/LaguQA](https://huggingface.co/datasets/IRedDragonICY/LaguQA) |
 | Dataset mirror | [kaggle.com/datasets/ireddragonicy/laguqa](https://www.kaggle.com/datasets/ireddragonicy/laguqa) |

@@ -19,6 +19,7 @@ Part of an undergraduate thesis in Informatics, Universitas Ahmad Dahlan.
 
 | | |
 |---|---|
+| Website | [laguqa.github.io](https://laguqa.github.io) |
 | Code | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Demo | [IRedDragonICY/LaguQA-Demo](https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo) |
 | Dataset | [IRedDragonICY/LaguQA](https://huggingface.co/datasets/IRedDragonICY/LaguQA) |

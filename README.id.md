@@ -21,6 +21,7 @@ Dahlan.
 
 | | |
 |---|---|
+| Situs | [laguqa.github.io](https://laguqa.github.io) |
 | Kode | [github.com/IRedDragonICY/LaguQA](https://github.com/IRedDragonICY/LaguQA) |
 | Demo | [IRedDragonICY/LaguQA-Demo](https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo) |
 | Dataset | [IRedDragonICY/LaguQA](https://huggingface.co/datasets/IRedDragonICY/LaguQA) |
