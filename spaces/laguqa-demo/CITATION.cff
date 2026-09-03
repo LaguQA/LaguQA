@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: Apabila LaguQA digunakan dalam penelitian, mohon sitasi entri berikut.
+title: "LaguQA: Benchmark Evaluasi Pemahaman Lagu Nasional dan Daerah Indonesia dengan Large Language Model"
+type: dataset
+authors:
+  - family-names: Hendianto
+    given-names: Mohammad Farid
+    affiliation: Program Studi Informatika, Universitas Ahmad Dahlan
+license: apache-2.0
+repository-code: "https://huggingface.co/spaces/IRedDragonICY/LaguQA-Demo"
+keywords:
+  - benchmark
+  - large language model
+  - bahasa Indonesia
+  - lagu nasional
+  - lagu daerah
+  - notasi angka

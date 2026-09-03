@@ -1,0 +1,80 @@
+{
+  "run_id": "gemma4-e2b-split70-s0-smoke",
+  "tag": "smoke",
+  "model": "gemma4-e2b",
+  "model_id": "google/gemma-4-E2B-it",
+  "auto_class": "AutoModelForCausalLM",
+  "dataset": "split70",
+  "train_file": "laguqa_train_split70.jsonl",
+  "test_file": "laguqa_test_split37.jsonl",
+  "train_sha256": "f86729689aac91fb14707fbb8662b0baffc505c9c5633d395348feb2413e35cc",
+  "examples": 256,
+  "seed": 0,
+  "epochs": 1,
+  "max_steps": 30,
+  "total_steps": 30,
+  "warmup_steps": 1,
+  "batch": 4,
+  "grad_accum": 4,
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "layers": 35,
+    "modules": 205,
+    "shapes": {
+      "down_proj,gate_proj,k_proj,o_proj,q_proj,up_proj,v_proj": 15,
+      "down_proj,gate_proj,o_proj,q_proj,up_proj": 20
+    }
+  },
+  "first_loss": 4.764582824707031,
+  "last_loss": 1.9332704544067383,
+  "loss_history": [
+    {
+      "loss": 4.764582824707031,
+      "grad_norm": 1.851197600364685,
+      "learning_rate": 0.00016473862847818277,
+      "entropy": 1.215165176987648,
+      "num_tokens": 15392.0,
+      "mean_token_accuracy": 0.44078290574252604,
+      "epoch": 0.625,
+      "step": 10
+    },
+    {
+      "loss": 2.3609113693237305,
+      "grad_norm": 2.4336912631988525,
+      "learning_rate": 6.298618446600856e-05,
+      "entropy": 2.5164836555719376,
+      "num_tokens": 29549.0,
+      "mean_token_accuracy": 0.5583780974149704,
+      "epoch": 1.25,
+      "step": 20
+    },
+    {
+      "loss": 1.9332704544067383,
+      "grad_norm": 2.3314690589904785,
+      "learning_rate": 5.862042845640403e-07,
+      "entropy": 2.0580291777849196,
+      "num_tokens": 44740.0,
+      "mean_token_accuracy": 0.6039800398051739,
+      "epoch": 1.875,
+      "step": 30
+    }
+  ],
+  "train_runtime_s": 41.3,
+  "total_s": 54.1,
+  "steps_done": 30,
+  "seconds_per_step": 1.377,
+  "gpu": "NVIDIA L40S",
+  "usd_per_hour": 1.95,
+  "estimated_cost_usd": 0.029,
+  "peak_memory_gb": 12.5,
+  "versions": {
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "peft": "0.20.0",
+    "trl": "1.12.0",
+    "datasets": "5.0.1",
+    "accelerate": "1.14.0"
+  }
+}

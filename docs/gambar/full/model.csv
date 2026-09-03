@@ -1,0 +1,7 @@
+model,kondisi,n_seed,rerata,terendah,tertinggi
+gemma4-e2b,dasar,1,19.46,19.46,19.46
+gemma4-e2b [final],dilatih,1,76.55,76.55,76.55
+gemma4-e2b [lr4e4],dilatih,1,76.65,76.65,76.65
+gemma4-e2b [penuh15],dilatih,1,77.15,77.15,77.15
+kontrol-acak,kontrol,1,26.55,26.55,26.55
+kontrol-konstan,kontrol,1,32.83,32.83,32.83

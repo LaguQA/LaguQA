@@ -1,0 +1,2 @@
+run_id,model_id,contoh,epoch,langkah,benih,gpu,detik,memori_gb,usd,loss_awal,loss_akhir
+gemma4-e2b-split70-s1,google/gemma-4-E2B-it,10000,3,1875,1,NVIDIA L40S,4289.3,12.5,2.338,7.821955871582031,0.1671517014503479

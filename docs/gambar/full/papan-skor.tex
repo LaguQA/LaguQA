@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Akurasi toleran (\%) pada LaguQA, regime \texttt{full}.}
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Model} & \textbf{Keseluruhan} & \textbf{Fakta} & \textbf{Abstain} & \textbf{Verifikasi} & \textbf{Lirik} & \textbf{Notasi} & \textbf{Penalaran} \\
+\midrule
+\multicolumn{8}{c}{\textit{Kontrol (tidak mengenal satu lagu pun)}} \\
+Tebakan tersering & 33.6 & 38.3 & 100.0 & 49.3 & 2.8 & 4.0 & 35.0 \\
+Tebakan acak & 28.6 & 25.7 & 100.0 & 52.7 & 1.6 & 4.0 & 21.0 \\
+Tidak menjawab & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+\midrule
+\multicolumn{8}{c}{\textit{Model tanpa pelatihan}} \\
+gemma4-e2b & 20.0 & 14.0 & 36.3 & 48.7 & 0.4 & 0.0 & 47.0 \\
+\midrule
+\multicolumn{8}{c}{\textit{Hasil fine-tuning LaguQA}} \\
+gemma4-e2b (benih 1) & 53.5 & 57.7 & 88.2 & 66.7 & 11.2 & 45.0 & 100.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

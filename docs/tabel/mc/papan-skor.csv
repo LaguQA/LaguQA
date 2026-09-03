@@ -1,0 +1,31 @@
+model,jenis,seed,berkas,Keseluruhan,Fakta,Tebak judul,Lirik,Notasi,Penalaran
+Tebakan ikut sebaran kunci,kontrol,,kontrol-prior--mc.jsonl,32.1,58.4,17.8,24.0,17.6,20.3
+Tebakan tersering,kontrol,,kontrol-konstan--mc.jsonl,21.2,20.9,15.9,24.8,19.7,21.4
+Tebakan acak,kontrol,,kontrol-acak--mc.jsonl,17.2,18.5,16.8,15.7,17.1,16.9
+Tidak menjawab,kontrol,,kontrol-kosong--mc.jsonl,0.0,0.0,0.0,0.0,0.0,0.0
+sahabatai-9b,dasar,,sahabatai-9b-base-peluang-opsi--mc.jsonl,29.5,25.3,27.1,25.6,17.1,47.2
+smollm3-3b,dasar,,smollm3-3b-base-peluang-opsi--mc.jsonl,27.1,35.9,19.6,16.1,24.9,29.3
+qwen-sealion-4b,dasar,,qwen-sealion-4b-base-peluang-opsi--mc.jsonl,25.2,21.7,19.6,20.7,19.2,39.3
+granite42-8b,dasar,,granite42-8b-base-peluang-opsi--mc.jsonl,24.2,26.1,19.6,18.2,26.9,26.9
+qwen35-4b,dasar,,qwen35-4b-base-peluang-opsi--mc.jsonl,24.2,16.8,18.7,21.1,21.8,39.7
+gemma4-e2b,dasar,,gemma4-e2b-base-peluang-opsi--mc.jsonl,24.1,25.5,21.5,18.2,17.1,32.8
+gemma4-e4b,dasar,,gemma4-e4b-base-peluang-opsi--mc.jsonl,24.1,24.7,20.6,19.0,19.2,32.1
+sealion-e2b,dasar,,sealion-e2b-base-peluang-opsi--mc.jsonl,23.8,22.0,19.6,18.6,15.5,37.6
+sealion-v35-8b,dasar,,sealion-v35-8b-base-peluang-opsi--mc.jsonl,23.0,28.5,17.8,17.8,24.4,21.4
+apertus-sealion-8b,dasar,,apertus-sealion-8b-base-peluang-opsi--mc.jsonl,22.6,24.5,22.4,12.8,21.8,29.0
+qwen35-9b,dasar,,qwen35-9b-base-peluang-opsi--mc.jsonl,21.8,25.8,22.4,16.1,21.8,21.4
+ornith-9b,dasar,,ornith-9b-base-peluang-opsi--mc.jsonl,21.0,18.8,20.6,17.4,21.8,26.6
+lfm25-2b,dasar,,lfm25-2b-base-peluang-opsi--mc.jsonl,18.8,14.9,19.6,19.8,24.4,19.0
+gemma4-e2b [lr4e4],dilatih,1,gemma4-e2b-full-s1-lr4e4-peluang-opsi--mc.jsonl,61.0,71.2,22.4,40.1,46.1,89.7
+gemma4-e2b [lr4e4],dilatih,3,gemma4-e2b-full14-s3-lr4e4-peluang-opsi--mc.jsonl,56.7,51.1,26.2,36.4,53.9,93.8
+gemma4-e2b [final],dilatih,1,gemma4-e2b-full-s1-final-peluang-opsi--mc.jsonl,56.4,63.6,27.1,30.2,50.3,84.1
+gemma4-e2b [lr4e4],dilatih,2,gemma4-e2b-full14-s2-lr4e4-peluang-opsi--mc.jsonl,52.3,55.4,25.2,35.1,40.9,80.3
+gemma4-e2b [final],dilatih,2,gemma4-e2b-full-s2-final-peluang-opsi--mc.jsonl,51.8,51.6,26.2,32.6,54.9,75.5
+gemma4-e2b [final],dilatih,3,gemma4-e2b-full-s3-final-peluang-opsi--mc.jsonl,51.7,60.9,25.2,33.5,25.4,82.8
+gemma4-e2b [penuh],dilatih,1,gemma4-e2b-full-s1-penuh-peluang-opsi--mc.jsonl,51.4,51.4,29.9,33.5,16.6,97.6
+gemma4-e2b [penuh-checkpoint-2622],dilatih,1,gemma4-e2b-full-s1-penuh-checkpoint-2622-peluang-opsi--mc.jsonl,50.3,51.9,26.2,32.6,15.0,95.5
+gemma4-e2b [r32],dilatih,1,gemma4-e2b-full-s1-r32-peluang-opsi--mc.jsonl,50.0,52.2,24.3,35.5,19.2,89.3
+gemma4-e2b [penuh15],dilatih,1,gemma4-e2b-full-s1-penuh15-peluang-opsi--mc.jsonl,46.2,42.1,18.7,26.9,18.7,96.2
+gemma4-e2b [penuh-checkpoint-1311],dilatih,1,gemma4-e2b-full-s1-penuh-checkpoint-1311-peluang-opsi--mc.jsonl,46.1,46.5,24.3,28.9,17.1,87.2
+gemma4-e2b [lr1e4],dilatih,1,gemma4-e2b-full-s1-lr1e4-peluang-opsi--mc.jsonl,46.0,47.3,26.2,25.2,17.6,87.9
+gemma4-e2b [r8],dilatih,1,gemma4-e2b-full-s1-r8-peluang-opsi--mc.jsonl,45.7,45.4,29.9,27.7,15.0,87.2

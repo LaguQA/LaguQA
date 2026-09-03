@@ -1,0 +1,6 @@
+gradio==6.26.0
+spaces
+torch>=2.8
+transformers>=4.45
+peft>=0.13
+accelerate

@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laguqa"
+version = "0.1.0"
+description = "A benchmark for evaluating LLM understanding of Indonesian national and regional songs"
+requires-python = ">=3.10"
+# license is deliberately left unset: the licence for the code and the licence
+# for the data are still being decided, and they will not be the same one.
+keywords = ["benchmark", "abc-notation", "jianpu", "indonesian-songs", "llm-evaluation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+]
+
+# Only the scan-preparation modules need anything outside the standard library:
+# Pillow for reading and writing the page images, numpy for the flat-field
+# division in scans/prep_scan.py. Notation, dataset, and benchmark are pure
+# standard library on purpose, so the benchmark can be reproduced without a
+# build toolchain.
+dependencies = [
+    "Pillow>=10",
+    "numpy>=1.24",
+]
+
+[project.scripts]
+laguqa-map-unnumbered = "laguqa.scans.map_unnumbered:main"
+laguqa-prep-scans = "laguqa.scans.prep_scan:main"
+laguqa-crop-scan = "laguqa.scans.crop_scan:main"
+laguqa-make-thumbs = "laguqa.scans.make_thumbs:main"
+laguqa-build-dataset = "laguqa.dataset.build:main"
+laguqa-abc-stub = "laguqa.notation.abc_stub:main"
+laguqa-abc-ingest = "laguqa.notation.abc_ingest:main"
+laguqa-abc-validate = "laguqa.notation.abc_validate:cli"
+laguqa-abc-sync = "laguqa.notation.abc_sync:main"
+laguqa-abc-meta = "laguqa.notation.abc_meta:main"
+laguqa-jianpu = "laguqa.notation.abc_to_jianpu:main"
+laguqa-split = "laguqa.dataset.split:main"
+laguqa-generate = "laguqa.benchmark.generate:main"
+laguqa-evaluate = "laguqa.benchmark.evaluate:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

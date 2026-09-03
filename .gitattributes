@@ -1,0 +1,3 @@
+# Naskah dikerjakan dari Windows dan Linux bergantian. Tanpa aturan ini tiap
+# perpindahan menghasilkan diff seluruh berkas yang isinya hanya akhir baris.
+* text=auto eol=lf

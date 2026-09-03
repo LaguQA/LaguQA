@@ -1,0 +1,23 @@
+kategori,soal,benar_gemma4-e2b (benih 1),benar_gemma4-e2b [seimbang] (benih 1),persen_gemma4-e2b (benih 1),persen_gemma4-e2b [seimbang] (benih 1),selisih_soal,selisih_persen
+KESELURUHAN,1002,536,719,53.5,71.8,183,18.3
+judul_ke_lirik,50,1,49,2.0,98.0,48,96.0
+notasi_ke_judul,50,41,3,82.0,6.0,-38,-76.0
+tempo,50,13,49,26.0,98.0,36,72.0
+pencipta,50,20,50,40.0,100.0,30,60.0
+jenis,50,26,50,52.0,100.0,24,48.0
+lanjut_lirik,50,6,24,12.0,48.0,18,36.0
+birama,50,36,50,72.0,100.0,14,28.0
+judul_ke_baris,50,0,13,0.0,26.0,13,26.0
+asal,50,39,50,78.0,100.0,11,22.0
+nada_dasar,50,39,50,78.0,100.0,11,22.0
+asal_abstain,50,41,50,82.0,100.0,9,18.0
+verifikasi_asal,50,34,40,68.0,80.0,6,12.0
+verifikasi_pencipta,50,30,27,60.0,54.0,-3,-6.0
+judul_ke_notasi,50,4,6,8.0,12.0,2,4.0
+tempo_abstain,2,0,2,0.0,100.0,2,100.0
+verifikasi_nada_dasar,50,36,38,72.0,76.0,2,4.0
+lirik_ke_judul,50,11,10,22.0,20.0,-1,-2.0
+nada_tertinggi,50,50,49,100.0,98.0,-1,-2.0
+pencipta_abstain,50,49,50,98.0,100.0,1,2.0
+rumpang,50,10,9,20.0,18.0,-1,-2.0
+hitung_bar,50,50,50,100.0,100.0,0,0.0

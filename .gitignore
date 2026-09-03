@@ -1,0 +1,53 @@
+# Adapter weights assembled for the Hub. Roughly 100 MB per run and nine runs
+# are planned, so they are distributed through the Hub rather than through git.
+# The manifest and model card that describe each one live in hasil/ and are
+# tracked, so a missing folder here costs provenance nothing.
+rilis/
+
+# Everything else under hasil/ IS tracked on purpose: the manifests and the
+# prediction files are the evidence behind every number in the thesis, they
+# are small, and an examiner has to be able to rescore them without a GPU.
+hasil/*.safetensors
+hasil/*.bin
+
+__pycache__/
+*.pyc
+.venv/
+logs/
+hasil/*.jsonl
+
+# Same rule as hasil/, applied to the second Modal account's results.
+hasil-akun2/*.jsonl
+
+# Modal API tokens. The file itself lives one level above this repo, but the
+# rule is set here so a stray copy inside it can never be committed either.
+.env
+.env.*
+
+# The report writer and the report it writes. Neither is part of the research:
+# naskah/ holds the thesis text, the supervisor's name, and their NIDN and NIPM.
+penyusun/
+naskah/
+
+# Notes written for the thesis, not documentation of the program.
+docs/RENCANA-SKRIPSI.md
+docs/aturan-penulisan-skripsi.md
+docs/periksa-metopen.md
+docs/pustaka-catatan.md
+docs/pustaka.bib
+docs/lirik-perlu-dicek.md
+
+# Screenshots of the Modal accounts' usage and billing pages.
+docs/bukti/
+
+# Everything derived from the source songbook. It is published through Hugging
+# Face and Kaggle under its own licence, which is the whole reason the data and
+# the code are released separately; committing it here would undo that.
+data/
+data-v14/
+arsip/
+rilis-dataset/
+rilis-kaggle/
+
+# Adapter weights, same reason as rilis/ above.
+rilis-model/

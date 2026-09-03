@@ -1,0 +1,358 @@
+================================================================================
+LAGUQA — JIANPU (NOTASI ANGKA) TO ABC 2.1 TRANSCRIPTION PROMPT
+version 2, calibrated on 7 transcribed songs (258 bars) plus one full manual repair
+================================================================================
+
+Send ONE song per conversation. If the song spans two pages, attach BOTH images
+(the _p1 and _p2 files) in the same message and treat them as one continuous
+piece. Use the images in scans_prep/, which have already been flattened for
+even lighting.
+
+--------------------------------------------------------------------------------
+SECTION 0 — OUTPUT CONTRACT (read this first, it overrides everything else)
+--------------------------------------------------------------------------------
+
+0.1 Your entire reply MUST be exactly one fenced code block, opened with three
+backticks followed by the word abc, and closed with three backticks. Nothing
+before it. Nothing after it. No preamble, no summary, no verification report,
+no confidence notes, no apology, no question.
+
+0.2 Every remark you want to make goes INSIDE the block as an ABC comment line
+starting with "%". This includes uncertainty. A doubtful bar is reported as:
+
+    % ragu: S3 M2, titik oktaf tidak terbaca, dipilih B karena kontur turun
+
+0.3 The block MUST follow this exact field order and MUST include every field
+listed. A field with no value in the source is written as a single hyphen "-".
+Never omit a line; never reorder them; never add header fields not listed here.
+
+    %abc-2.1
+    % laguqa-do <the "Do = X" or "1 = X" value exactly as printed>
+    % laguqa-halaman <page number printed on the page, or ->
+    X:1
+    T:<TITLE AS PRINTED, UPPERCASE>
+    C:<composer as printed after "Cipt:", or ->
+    O:<region as printed, e.g. Sumatera Utara, or ->
+    Q:"<tempo words as printed>"
+    M:<meter>
+    L:1/8
+    K:<key derived from Do = X>
+    <music lines and w: lines>
+
+Always write X:1 literally. You cannot see the filename of the image you were
+given, so do not guess a song number, and never put the page number there. The
+song number is filled in later by a script that does know the filename. Any
+number you invent will be discarded, and a wrong guess only creates confusion.
+
+0.4 If the meter is not printed anywhere on the page, derive it by counting a
+full bar, write the derived value in M:, and add this comment immediately after
+the K: line:
+
+    % birama tidak tercetak di halaman, disimpulkan dari hitungan bar
+
+0.5 If the page contains only guitar chord diagrams and photographs, with no
+number notation and no lyrics, output only the header fields with T: filled in
+and this single comment line in place of the music:
+
+    % halaman hanya berisi diagram akor, tidak ada notasi
+
+--------------------------------------------------------------------------------
+SECTION 1 — THE FIVE MISTAKES THAT ACTUALLY HAPPENED
+--------------------------------------------------------------------------------
+
+These are not hypothetical. They were measured on real output from this exact
+task. Four of them are duration or register errors and together they caused
+every failed bar. Read this section twice.
+
+M1. A DIGIT WITH NO BEAM IS A FULL BEAT, NOT HALF A BEAT.
+    This single mistake produced nine failed bars in one song, all identical.
+    A bare digit with nothing drawn above it lasts one full beat. At L:1/8 that
+    is TWO units, written "A2". It is not "A".
+
+M2. THE VALUE OF A DOT DEPENDS ON THE BEAM ABOVE THE DOT ITSELF.
+    A dot extends the note before it. How much it extends by is decided by
+    whether that dot sits under a beam:
+        dot with NO beam above it        -> adds 2 units (a full beat)
+        dot UNDER a single beam          -> adds 1 unit (half a beat)
+    Do not give every dot a fixed value. Look above each dot.
+
+M3. DO NOT INVENT SIXTEENTH NOTES.
+    "/2" means a sixteenth and requires TWO stacked beam lines above the digit.
+    One beam line is an eighth, written as a plain letter with no suffix.
+    Writing "c/2B/2" for singly beamed digits is wrong.
+
+M4. AN UNDOTTED DIGIT IS NOT IN THE UPPER OCTAVE.
+    Octave errors survive beat checking, because the durations stay correct.
+    They are caught only by range. See Section 3 for the mapping and Section 6
+    for the range test you must run before answering.
+
+M5. A SLUR MEANS ONE SYLLABLE OVER TWO NOTES.
+    When a curved line joins two digits under a single printed syllable, the
+    second note takes "_" in the w: line, not a repeat of the syllable.
+
+M6. NEVER WRITE A DOT OR A DASH INTO THE ABC.
+    The dot and the dash are jianpu glyphs. They have no meaning as durations
+    in ABC. In ABC a bare "." is a staccato mark, so writing "c2 . d c B"
+    produces a staccato and loses the beat entirely.
+    A dot is consumed by ADDING its value to the number on the note before it.
+
+        printed  "3 . 3 3 2"  with a beam over the middle "3 3"
+        wrong    F4 . F F E2         the dot leaked through
+        right    F4 F F E2           the dot is already inside the "4"
+
+    After you finish a bar, scan it: if any "." or "-" survives as a standalone
+    token, you have not finished converting it.
+
+M7. DO NOT COPY THE SHAPE OF THE EXAMPLES.
+    The two bars in Section 2 have opposite layouts on purpose. One starts with
+    an unbeamed note and ends with beamed ones; the other does the reverse.
+    Beams fall wherever the engraver put them. Read each bar's beams from the
+    image every time. Never assume a bar begins or ends a particular way.
+
+--------------------------------------------------------------------------------
+SECTION 2 — WORKED EXAMPLE (memorise the shape of this bar)
+--------------------------------------------------------------------------------
+
+Printed on the page, in a song headed "Do = d" and "4/4":
+
+        1'  7  1'  .  7   6  5
+            ‾‾‾‾‾  ‾‾‾‾   ‾‾‾‾
+        (the overlines show which digits share a beam; the first 1' has none,
+         and the dot shares a beam with the 7 that follows it)
+
+Read it glyph by glyph:
+
+    1'   no beam                    -> d2      2 units
+    7    one beam                   -> c       1 unit
+    1'   one beam, then a dot that
+         is itself under a beam     -> d2      1 unit + 1 unit from the dot
+    7    one beam                   -> c       1 unit
+    6 5  one beam, curved line      -> (B A)   1 unit + 1 unit
+                                       -----------------------
+                                       total   8 units = 4/4  CORRECT
+
+    correct output:  d2 c d2 c (B A)
+    wrong output:    d c d3 c/2B/2 A      only 7 units, rejected
+
+EXAMPLE B — the opposite layout. Printed in a song headed "Do = C" and "4/4":
+
+        6  6  7  6  5
+           ‾‾‾‾‾
+        ‿‿‿‿‿
+        (only the SECOND and THIRD digits share a beam. The first digit has no
+         beam. The last two digits have no beam. The curved line underneath
+         joins digits one and two, and one printed syllable sits under them.)
+
+Read it glyph by glyph:
+
+    6    no beam                    -> A2      2 units
+    6    one beam                   -> A       1 unit
+    7    one beam                   -> B       1 unit
+    6    no beam                    -> A2      2 units
+    5    no beam                    -> ^G2     2 units
+                                       -----------------------
+                                       total   8 units = 4/4  CORRECT
+
+    correct output:  (A2 A) B A2 ^G2
+    wrong output:    A2 A B A ^G           only 6 units, rejected
+
+    The slur wraps digits one and two, so the lyric is "Bu- _ ngong jeum- pa":
+    one syllable plus one "_" for the slurred pair, then one syllable per note.
+
+COMPARE THE TWO EXAMPLES. In example A the bar ENDS with beamed eighth notes.
+In example B it ends with unbeamed full beats. Both are 8 units. The only way
+to tell them apart is to look at where the beams are drawn. There is no default
+shape, and the ending of one bar tells you nothing about the next.
+
+--------------------------------------------------------------------------------
+SECTION 3 — PITCH: BUILD THE TABLE BEFORE YOU WRITE ANY NOTE
+--------------------------------------------------------------------------------
+
+3.1 ABC OCTAVE LETTERS. Get this right or everything shifts.
+
+        C,  D,  E,  F,  G,  A,  B,     octave below middle C
+        C   D   E   F   G   A   B      C here IS MIDDLE C
+        c   d   e   f   g   a   b      the octave above middle C
+        c'  d'  e'  f'  g'  a'  b'     two octaves above middle C
+
+    Uppercase C is middle C. Lowercase c is one octave HIGHER than uppercase C.
+    A comma lowers one octave, an apostrophe raises one octave.
+
+3.2 CHOOSING THE REGISTER. Read the printed "Do = X" or "1 = X". Then place the
+scale so that most notes of the song land between C (middle C) and c. Songs in
+this book are written for ordinary voices and almost never leave that area.
+
+    Example, Do = C:
+        1=C  2=D  3=E  4=F  5=G  6=A  7=B   1 with dot above = c
+        5 with dot below = G,
+
+    Example, Do = D, key signature K:D:
+        1=D  2=E  3=F  4=G  5=A  6=B  7=c   1 with dot above = d
+        F and c are automatically sharp because of K:D, do not write ^
+
+    Example, Do = G, key signature K:G:
+        If the melody dwells on 1' and 2' you have placed the scale too high.
+        Try 1=G, and check again. Pick the placement that keeps the song inside
+        the singable area.
+
+3.3 OCTAVE DOTS. A dot centred directly ABOVE a digit raises it one octave. A
+dot directly BELOW lowers it one octave. Two dots means two octaves. These dots
+sit on the digit's vertical axis. Do not confuse them with the duration dot,
+which is printed to the RIGHT of a digit at mid height, nor with print specks
+and show-through from the reverse page.
+
+3.4 KEY SIGNATURE. K: comes strictly from the printed "Do = X". Do not change
+it because the melody sounds minor. Many songs here are printed "Do = C" while
+the tune centres on 6 and ends on 6. That is the relative minor, and K:C is
+still the correct key signature. Note it with a comment and move on:
+
+    % melodi berpusat pada 6 dan berakhir di 6, minor relatif
+
+3.5 ACCIDENTALS. A printed sharp or flat before a digit maps to "^" or "_"
+before the note letter. A digit with a diagonal stroke through it is this
+book's way of writing a raised note; read it as a sharp, write "^", and add a
+comment recording it.
+
+--------------------------------------------------------------------------------
+SECTION 4 — DURATION ENGINE
+--------------------------------------------------------------------------------
+
+4.1 Always use L:1/8. One beat is 2 units. A 4/4 bar holds 8 units, 3/4 holds 6,
+2/4 holds 4, 6/8 holds 6.
+
+4.2 Duration from the beam count above a digit:
+
+        no beam           one full beat        2 units      write "A2"
+        one beam          half a beat          1 unit       write "A"
+        two beams         quarter of a beat    1/2 unit     write "A/2"
+
+4.3 Duration dots, printed to the right of a digit:
+
+        dot with no beam above it      adds 2 units
+        dot under one beam             adds 1 unit
+        several dots in a row          add their values in sequence
+
+    So "5 . . 0" with nothing beamed is A held three beats then a one beat rest,
+    written "A6 z2". And "5 ." with no beams is A held two beats, "A4".
+
+4.4 The digit 0 is a rest. It takes its duration from the same rules and is
+written "z" or "z2". A rest never carries a lyric syllable.
+
+4.5 Dashes after a digit each add one full beat, same as an unbeamed dot.
+
+4.6 Triplets are printed as a bracket marked 3 over three digits. Write them as
+"(3" followed by the three notes. Verify the group total on the grid.
+
+4.7 Anacrusis. If the first bar is short, transcribe it short. The first and
+last bar together should add up to one full bar. Do not pad either of them.
+
+--------------------------------------------------------------------------------
+SECTION 5 — LYRICS
+--------------------------------------------------------------------------------
+
+5.1 Put each verse on its own w: line, placed directly after the music line it
+belongs to. Two verses under one system means two consecutive w: lines.
+
+5.2 Token rules:
+
+        -    separates syllables inside one word:      In- jit
+        _    holds the previous syllable over one more note (slur, melisma)
+        *    skips a note that carries no syllable
+
+5.3 The count must balance exactly. Number of tokens on a w: line must equal the
+number of PITCHED notes on its music line. Rests are not counted and take no
+token. Count both sides before you move on.
+
+5.4 Copy the hyphenation from the page, even where the book splits a word oddly.
+Do not add, merge, or drop syllables to make the arithmetic work. If the count
+does not balance, you have misread a note or a slur, so go back and re-read the
+image rather than editing the lyrics.
+
+--------------------------------------------------------------------------------
+SECTION 6 — MANDATORY SELF-CHECK BEFORE YOU ANSWER
+--------------------------------------------------------------------------------
+
+Run all five. Do not show your working; just fix what fails, then output.
+
+C1. BAR SUMS. For every bar, add the units and compare with the meter quota.
+    Every interior bar must match exactly. Fix any that do not.
+
+C2. RANGE. Find your lowest and highest note and count the semitones between
+    them. Songs in this book span roughly 5 to 14 semitones. If yours exceeds
+    17, you have almost certainly put a group of notes in the wrong octave.
+    Go back to Section 3.1 and re-place the scale.
+
+C3. LEAPS. No two consecutive notes should be more than an octave apart. If any
+    pair is, one of the two is in the wrong octave.
+
+C4. SYLLABLES. For each w: line, token count equals pitched-note count.
+
+C5. SHAPE. First line is %abc-2.1. All fields from Section 0.3 are present, in
+    that order, with "-" where empty. The reply is one fenced abc block and
+    contains nothing else.
+
+--------------------------------------------------------------------------------
+SECTION 7 — THINGS NOT TO DO
+--------------------------------------------------------------------------------
+
+7.1 Do not complete a song from memory. Transcribe only what the image shows.
+    If you recognise the tune, use that only to break a tie between two readings
+    that the evidence leaves equally likely, and say so in a comment.
+
+7.2 Do not add slurs, ties, ornaments, dynamics, repeats, or chords that are not
+    printed.
+
+7.3 Do not silently correct the book. If the printed text has an obvious typo,
+    reproduce it and note it:
+
+        % buku menulis "Simanjunatak"
+
+7.4 Do not force a bar to balance by changing a pitch. If a bar refuses to add
+    up after a careful re-reading, write it as you read it and flag it:
+
+        % ragu: S4 M3 berjumlah 7/8, garis balok tidak terbaca jelas
+
+7.5 Do not write chord diagrams or hand photographs into the notation. Chord
+    letters printed above the number line are copied through as "D" or "A7"
+    immediately before the note they sit over. Chord boxes at the bottom of the
+    page are ignored.
+
+7.6 Do not use these deprecated constructs: "+" as a chord delimiter, "+...+"
+    decorations, the A: field, or a bare "Q:120".
+
+--------------------------------------------------------------------------------
+SECTION 8 — COMPLETE REFERENCE OUTPUT
+--------------------------------------------------------------------------------
+
+This is a real verified transcription, ABRIDGED to four systems to keep this
+prompt short. The actual song has eight. Match the SHAPE exactly, but never
+truncate a song: transcribe every system on every page you are given, right
+through to the final barline.
+
+```abc
+%abc-2.1
+% laguqa-do d
+% laguqa-halaman -
+X:1
+T:INJIT-INJIT SEMUT
+C:-
+O:Sumatera Utara
+Q:"Agak cepat"
+M:4/4
+L:1/8
+K:D
+|: z d d d |"D" d2 c d2 c (B A) | A4 z B B B |"G" B B B3 A (G A) |
+w: Ja- lan ja- lan ke ta- nah De- _ li sung- guh in- dah tem- pat ta- mas- _
+w: Na- ik p'ra- hu ke pu- lau S'ri- _ bu sung- guh in- dah si pu- lau Ka- _
+|"D" A4 z2 A2 |"A7" E2 E E2 E (E F) | G4 z c c c | c2 c d2 c (B A) |
+w: Sya Ka- wan ja- ngan ber- se- _ dih ma- ri nya- nyi ber- sa- ma sa- _
+w: rang Sung- guh ma- lang na- sib- _ ku pu- nya pa- car di- am- bil o- _
+|"D" D4 z2 A2 | F4 F F E2 | D4 F F F2 | E2 D D2 C (D E) |
+w: ri In- jit in- jit se- mut sia- pa sa- kit na- ik di a- _
+|"A7" E4 z2 G2 | G4 B B B2 | A4 A A B2 | A2 G G2 F (F E) |"D" D4 :|
+w: tas In- jit in- jit se- mut wa- lau sa- kit ja- ngan di le- _ pas
+```
+
+Note in that example how every unbeamed digit became a "2" suffix, how "A4"
+carries a note plus an unbeamed dot, how rests take no lyric token, and how each
+slurred pair spends one syllable plus one "_".

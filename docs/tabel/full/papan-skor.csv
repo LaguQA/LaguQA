@@ -1,0 +1,8 @@
+model,jenis,seed,berkas,Keseluruhan,Fakta,Abstain,Verifikasi,Lirik,Notasi,Penalaran
+Tebakan tersering,kontrol,,kontrol-konstan--full.jsonl,32.8,39.7,100.0,50.7,2.8,6.0,19.0
+Tebakan acak,kontrol,,kontrol-acak--full.jsonl,26.5,27.3,100.0,43.3,1.6,4.0,9.0
+Tidak menjawab,kontrol,,kontrol-kosong--full.jsonl,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+gemma4-e2b,dasar,,gemma4-e2b-base--full.jsonl,19.5,14.3,36.3,40.7,0.4,0.0,53.0
+gemma4-e2b [penuh15],dilatih,1,gemma4-e2b-full-s1-penuh15--full.jsonl,77.1,99.7,100.0,79.3,40.4,52.0,100.0
+gemma4-e2b [lr4e4],dilatih,1,gemma4-e2b-full-s1-lr4e4--full.jsonl,76.6,97.7,98.0,73.3,48.0,45.0,100.0
+gemma4-e2b [final],dilatih,1,gemma4-e2b-full-s1-final--full.jsonl,76.5,100.0,100.0,70.0,45.6,46.0,100.0

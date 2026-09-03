@@ -1,0 +1,6 @@
+model,jenis,benih,berkas,Keseluruhan,Fakta,Abstain,Verifikasi,Lirik,Notasi,Penalaran
+Tebakan tersering,kontrol,,kontrol-konstan--full.jsonl,33.6,38.3,100.0,49.3,2.8,4.0,35.0
+Tebakan acak,kontrol,,kontrol-acak--full.jsonl,28.6,25.7,100.0,52.7,1.6,4.0,21.0
+Tidak menjawab,kontrol,,kontrol-kosong--full.jsonl,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+gemma4-e2b,dasar,,gemma4-e2b-base--full.jsonl,20.0,14.0,36.3,48.7,0.4,0.0,47.0
+gemma4-e2b,dilatih,1,gemma4-e2b-full-s1--full.jsonl,53.5,57.7,88.2,66.7,11.2,45.0,100.0

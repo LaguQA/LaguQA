@@ -1,0 +1,5 @@
+model,kondisi,n_benih,rerata,terendah,tertinggi
+gemma4-e2b,dasar,1,16.19,16.19,16.19
+gemma4-e2b,dilatih,1,36.68,36.68,36.68
+kontrol-acak,kontrol,1,23.47,23.47,23.47
+kontrol-konstan,kontrol,1,27.64,27.64,27.64
