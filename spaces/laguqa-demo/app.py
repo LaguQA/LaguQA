@@ -431,12 +431,15 @@ def catatan_tabel(nama: str) -> str:
     return "\n".join(baris).strip()
 
 
-def sel(nilai: float | None, terbaik: bool, bawah: bool) -> str:
+def sel(nilai: float | None, terbaik: bool, bawah: bool, label: str) -> str:
+    """Label kolom ikut ditulis di tiap sel karena pada layar kecil barisnya
+    berubah menjadi kartu dan kepala tabelnya tidak ikut terbaca."""
     if nilai is None:
-        return '<td class="lq-angka lq-hampa">—</td>'
+        return f'<td class="lq-angka lq-hampa" data-l="{label}">—</td>'
     kelas = "lq-angka" + (" lq-terbaik" if terbaik else "")
     tanda = ' <span class="lq-bawah" title="di bawah batas bawah">↓</span>' if bawah else ""
-    return f'<td class="{kelas}">{nilai:.1f}{tanda}</td>'
+    return (f'<td class="{kelas}" data-l="{label}">'
+            f'<span class="lq-skor">{nilai:.1f}</span>{tanda}</td>')
 
 
 def papan(jalur: str, model: list[dict], kelompokkan: bool = True) -> str:
@@ -464,8 +467,9 @@ def papan(jalur: str, model: list[dict], kelompokkan: bool = True) -> str:
         if nilai:
             terbaik[k] = max(nilai)
 
-    kepala = "".join(f'<th class="lq-angka">{html.escape(METRIK[k]["label"].split(": ")[-1])}</th>'
-                     for k in kolom)
+    label = {k: html.escape(METRIK[k]["label"].split(": ")[-1], quote=True)
+             for k in kolom}
+    kepala = "".join(f'<th class="lq-angka">{label[k]}</th>' for k in kolom)
     baris = [f'<thead><tr><th>Model</th>{kepala}</tr></thead><tbody>']
     jenis_sekarang = None
     for m in punya:
@@ -477,13 +481,14 @@ def papan(jalur: str, model: list[dict], kelompokkan: bool = True) -> str:
         sel_baris = "".join(
             sel(m["skor"].get(k), m["skor"].get(k) == terbaik.get(k),
                 k in LANTAI and m["jenis"] != "kontrol"
-                and m["skor"].get(k, 0) < LANTAI[k])
+                and m["skor"].get(k, 0) < LANTAI[k], label[k])
             for k in kolom)
         gpu = f' <span class="lq-gpu">{m["gpu"]}</span>' if m.get("gpu") else ""
         baris.append(f'<tr><td class="lq-nama">{html.escape(m["nama"])}{gpu}</td>'
                      f'{sel_baris}</tr>')
     baris.append("</tbody>")
-    return f'<div class="lq-gulir"><table class="lq-papan">{"".join(baris)}</table></div>'
+    return (f'<div class="lq-gulir lq-gulir-papan">'
+            f'<table class="lq-papan">{"".join(baris)}</table></div>')
 
 
 def tabel(nama: str) -> tuple[str, str]:
@@ -632,6 +637,103 @@ window.laguqaGiliran = 0;
 window.laguqaAbc = "";
 window.laguqaJangkauan = "";
 
+// Navigasi ikon untuk layar kecil. Gradio membangun tombol tabnya belakangan
+// dan memindahkan yang tidak muat ke menu limpahan, sehingga tombol dicari
+// lewat labelnya, bukan lewat id yang bisa hilang. Kelas penanda hanya
+// dipasang bila kelima tab ditemukan; tanpanya navigasi teks bawaan tetap
+// tampil dan aplikasi tidak pernah kehilangan navigasi.
+// Di dalam iframe, bilah yang dipatok ke dasar jendela tidak bisa dipercaya.
+// Halaman Space memberi iframe tinggi seluruh isi dan mematikan gulirannya,
+// sehingga yang bergulir adalah halaman induk dan dasar jendela kita berada
+// jauh di bawah layar. Halaman anak juga tidak diberi cara mengetahui bagian
+// mana yang sedang terlihat: IntersectionObserver berhenti diperbarui ketika
+// yang bergulir induknya, dan getPageInfo milik iframe-resizer tidak selalu
+// ada. Maka aturannya dibuat pasti: berdiri sendiri memakai bilah bawah,
+// tertanam memakai bilah atas, tepat di bawah kepala halaman.
+window.laguqaNavTerbenam = function () {{
+  try {{
+    return window.self !== window.top;
+  }} catch (e) {{
+    return true;
+  }}
+}};
+
+window.laguqaNavTempat = function (bar) {{
+  if (!window.laguqaNavTerbenam()) return;
+  bar.classList.add("lq-atas");
+  var blok = bar.closest ? bar.closest(".block") : null;
+  if (blok) blok.classList.add("lq-atas");
+}};
+
+window.laguqaNavTombol = function (label) {{
+  var i, daftar = document.querySelectorAll('[role="tab"]');
+  for (i = 0; i < daftar.length; i++) {{
+    if (daftar[i].textContent.trim() === label) return daftar[i];
+  }}
+  daftar = document.querySelectorAll(".overflow-dropdown button");
+  for (i = 0; i < daftar.length; i++) {{
+    if (daftar[i].textContent.trim() === label) return daftar[i];
+  }}
+  return null;
+}};
+
+window.laguqaNavSiap = function () {{
+  var bar = document.getElementById("lq-iconnav");
+  if (!bar) return true;
+  var ikon = bar.querySelectorAll("button[data-tab]");
+  if (!ikon.length) return false;
+  var i;
+  for (i = 0; i < ikon.length; i++) {{
+    if (!window.laguqaNavTombol(ikon[i].getAttribute("data-tab"))) return false;
+  }}
+  function tandai() {{
+    for (var k = 0; k < ikon.length; k++) {{
+      var asli = window.laguqaNavTombol(ikon[k].getAttribute("data-tab"));
+      var aktif = !!asli && (asli.getAttribute("aria-selected") === "true"
+                             || asli.classList.contains("selected")
+                             || asli.classList.contains("active"));
+      if (aktif) {{
+        ikon[k].classList.add("aktif");
+        ikon[k].setAttribute("aria-current", "page");
+      }} else {{
+        ikon[k].classList.remove("aktif");
+        ikon[k].removeAttribute("aria-current");
+      }}
+    }}
+  }}
+  if (bar.getAttribute("data-siap") !== "ya") {{
+    bar.setAttribute("data-siap", "ya");
+    bar.classList.add("lq-siap");
+    bar.addEventListener("click", function (ev) {{
+      var t = ev.target.closest ? ev.target.closest("button[data-tab]") : null;
+      if (!t) return;
+      var asli = window.laguqaNavTombol(t.getAttribute("data-tab"));
+      if (asli) asli.click();
+      setTimeout(tandai, 60);
+    }});
+    var bungkus = document.querySelector(".tab-wrapper");
+    if (bungkus) {{
+      bungkus.classList.add("lq-nav-alih");
+      new MutationObserver(tandai).observe(
+        bungkus, {{ subtree: true, childList: true, attributes: true,
+                   attributeFilter: ["class", "aria-selected"] }});
+    }}
+    window.laguqaNavTempat(bar);
+    window.addEventListener("resize", function () {{
+      window.laguqaNavTempat(bar);
+    }});
+  }}
+  tandai();
+  return true;
+}};
+var lqNavCoba = 0;
+var lqNavPewaktu = setInterval(function () {{
+  lqNavCoba++;
+  try {{
+    if (window.laguqaNavSiap() || lqNavCoba > 60) clearInterval(lqNavPewaktu);
+  }} catch (e) {{ clearInterval(lqNavPewaktu); }}
+}}, 250);
+
 window.laguqaLolos = function (s) {{
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
                   .replace(/>/g, "&gt;");
@@ -684,10 +786,14 @@ window.laguqaTampil = async function (abc, alat) {{
   window.laguqaSorotAbc(null, null);
   if (!abc) {{ kertas.innerHTML = ""; return; }}
 
+  // Lebar paranada mengikuti wadahnya, bukan angka tetap. Pada layar HP
+  // abcjs membungkus not menjadi lebih banyak sistem sehingga ukuran notnya
+  // tetap penuh dan terbaca; memaksa 720px lalu mengecilkan gambarnya justru
+  // membuat notasi tak terbaca.
   const visual = ABCJS.renderAbc(kertas, abc, {{
     responsive: "resize",
     add_classes: true,
-    staffwidth: 720,
+    staffwidth: Math.min(720, kertas.clientWidth || 720),
     format: {{
       titlefont: "Inter 15 bold", subtitlefont: "Inter 12",
       composerfont: "Inter 11 italic", vocalfont: "Inter 11",
@@ -843,34 +949,40 @@ CSS = """
 /* margin auto ditulis eksplisit. max-width saja membuat isinya menempel ke
    tepi kiri pada layar lebar, karena Gradio 6 memakai lebar penuh sebagai
    bawaan dan tidak lagi menengahkan wadahnya sendiri. */
-.gradio-container { max-width: 1080px !important;
+.gradio-container { max-width: 1080px !important; width: 100% !important;
+                    min-width: 0 !important;
                     margin-left: auto !important; margin-right: auto !important; }
 
 /* --- kepala --- */
 #lq-kepala { border-top: 3px solid var(--primary-600);
              border-bottom: 1px solid var(--border-color-primary);
              padding: 1.5rem 0 1.1rem; margin-bottom: .4rem; }
-#lq-kepala .lq-merek { display: flex; align-items: center; gap: .9rem; }
+#lq-kepala .lq-merek { display: flex; align-items: center; gap: .7rem; }
 /* Lambangnya angka 1 bergaris bawah, yaitu do seperdelapan dalam notasi
    angka. Garis bawah dipilih menggantikan titik oktaf karena angka bertitik
    di atas terbaca sebagai huruf i pada ukuran sekecil ini. */
-#lq-kepala .lq-lambang { width: 44px; height: 44px; flex: 0 0 44px;
+#lq-kepala .lq-lambang { width: 40px; height: 40px; flex: 0 0 40px;
     background: var(--primary-600); color: #fff; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 1.5rem; font-weight: 600;
+    font-family: var(--font-mono); font-size: 1.4rem; font-weight: 600;
     line-height: 1; position: relative; }
-#lq-kepala .lq-lambang::after { content: ""; position: absolute; bottom: 11px;
-    width: 15px; height: 2px; background: #fff; }
-#lq-kepala h1 { font-size: 1.55rem; font-weight: 650; letter-spacing: -.02em;
-                margin: 0; line-height: 1.15; }
-#lq-kepala .lq-sub { color: var(--body-text-color-subdued); margin: .15rem 0 0;
-                     font-size: .95rem; }
-#lq-kepala .lq-angka { display: flex; flex-wrap: wrap; gap: .5rem;
-                       margin: 1rem 0 0; }
-#lq-kepala .lq-angka span { font-size: .82rem; padding: .25rem .6rem;
-    border: 1px solid var(--border-color-primary); border-radius: 999px;
+#lq-kepala .lq-lambang::after { content: ""; position: absolute; bottom: 10px;
+    width: 14px; height: 2px; background: #fff; }
+#lq-kepala h1 { font-size: 1.6rem; font-weight: 650; letter-spacing: -.025em;
+                margin: 0; line-height: 1.1; }
+#lq-kepala .lq-sub { color: var(--body-text-color-subdued);
+    margin: .55rem 0 0; font-size: .95rem; line-height: 1.5; }
+#lq-kepala .lq-angka { display: grid; margin: 1.15rem 0 0; max-width: 760px;
+    grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); }
+#lq-kepala .lq-angka > div { display: flex; flex-direction: column;
+    gap: .15rem; padding: .5rem .8rem .15rem 0;
+    border-top: 1px solid var(--border-color-primary); }
+#lq-kepala .lq-angka dd { order: -1; margin: 0; font-size: 1.15rem;
+    font-weight: 600; line-height: 1.1; letter-spacing: -.02em;
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+#lq-kepala .lq-angka dt { font-size: .7rem; letter-spacing: .04em;
+    line-height: 1.3; text-transform: uppercase;
     color: var(--body-text-color-subdued); }
-#lq-kepala .lq-angka b { color: var(--body-text-color); font-weight: 600; }
 
 /* --- keping penanda --- */
 .lq-keping { display: inline-block; font-size: .75rem; letter-spacing: .01em;
@@ -907,7 +1019,9 @@ CSS = """
 
 /* --- not balok, digambar abcjs --- */
 #lq-kertas { padding: .4rem .2rem; overflow-x: auto; }
-#lq-kertas svg { max-width: 100%; }
+/* width 100% + height auto menjaga aspek saat wadah menyempit; tanpa height
+   auto, max-width saja membuat gambar gepeng pada layar kecil. */
+#lq-kertas svg { width: 100%; max-width: 100%; height: auto; }
 #lq-kertas svg text, #lq-kertas svg tspan, #lq-kertas svg path {
     fill: var(--body-text-color); }
 #lq-kertas svg path[stroke], #lq-kertas svg line, #lq-kertas svg .abcjs-staff,
@@ -1009,10 +1123,13 @@ CSS = """
                     border-radius: 2px; padding: 0 1px; }
 
 /* --- papan skor --- */
-.lq-gulir { overflow-x: auto; }
-.lq-papan { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.lq-gulir { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.lq-papan { border-collapse: collapse; border: 0 !important; width: 100%;
+             font-size: .88rem; }
 .lq-papan th, .lq-papan td { padding: .4rem .6rem; text-align: left;
-    border-bottom: 1px solid var(--border-color-primary); white-space: nowrap; }
+    border: 0 !important;
+    border-bottom: 1px solid var(--border-color-primary) !important;
+    white-space: nowrap; }
 .lq-papan thead th { font-weight: 600; font-size: .8rem;
     color: var(--body-text-color-subdued); border-bottom-width: 2px; }
 .lq-papan .lq-angka { text-align: right; font-variant-numeric: tabular-nums; }
@@ -1031,6 +1148,9 @@ CSS = """
     color: var(--body-text-color-subdued); }
 
 /* --- diagram sebar --- */
+/* min-width sengaja dipertahankan: menghapusnya membuat label 10px menciut
+   tak terbaca pada layar kecil. Keterbacaan dijaga lewat gulir mendatar yang
+   mulus, bukan lewat pengecilan gambar. */
 .lq-sebar { width: 100%; min-width: 620px; height: auto; }
 .lq-sebar .lq-kisi { stroke: var(--border-color-primary); stroke-width: 1; }
 .lq-sebar .lq-lantai { stroke: var(--primary-500); stroke-width: 1.5;
@@ -1045,45 +1165,166 @@ CSS = """
     border-top: 1px solid var(--border-color-primary);
     padding-top: .9rem; margin-top: 1.4rem; }
 .lq-catatan p { margin: .45rem 0; }
+
+/* --- layar kecil: keterbacaan dulu, kerapian kedua --- */
+@media (max-width: 760px) {
+  /* Papan skor berubah menjadi kartu. Menggeser tabel tujuh kolom pada
+     layar 6 inci berarti nama modelnya menghabiskan seluruh lebar dan
+     angkanya tidak pernah terlihat bersama nama pemiliknya. */
+  .lq-gulir-papan { overflow-x: visible; }
+  .lq-papan, .lq-papan tbody, .lq-papan tr, .lq-papan td { display: block; }
+  .lq-papan thead { display: none; }
+  .lq-papan tbody tr { display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: .1rem .7rem; padding: .6rem .75rem .7rem; margin-bottom: .5rem;
+    border: 1px solid var(--border-color-primary) !important;
+    border-radius: 6px; }
+  .lq-papan tbody tr:hover td { background: none; }
+  .lq-papan td { padding: 0; border: 0 !important; white-space: normal; }
+  .lq-papan td.lq-nama { grid-column: 1 / -1; font-size: .85rem;
+    line-height: 1.35; word-break: break-word; padding-bottom: .45rem;
+    margin-bottom: .3rem;
+    border-bottom: 1px solid var(--border-color-primary) !important; }
+  .lq-papan td.lq-angka { text-align: left; padding-top: .35rem;
+    font-size: .95rem; font-variant-numeric: tabular-nums; }
+  .lq-papan td.lq-angka::before { content: attr(data-l); display: block;
+    font-size: .64rem; letter-spacing: .03em; text-transform: uppercase;
+    line-height: 1.2; color: var(--body-text-color-subdued); }
+  .lq-papan td.lq-terbaik { background: none; color: var(--body-text-color); }
+  .lq-papan td.lq-terbaik .lq-skor { background: var(--primary-600);
+    color: #fff; border-radius: 3px; padding: 0 .3rem; }
+  .lq-papan tbody tr.lq-grup { display: block; border: 0 !important;
+    border-radius: 0; margin: 0; padding: 1rem 0 .3rem; }
+  .lq-papan .lq-grup td { font-size: .78rem; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--body-text-color-subdued); }
+  /* Huruf diagram sebar dibesarkan mengimbangi penyempitan wadah. */
+  .lq-sebar .lq-tik { font-size: 12px; }
+  .lq-sebar .lq-label { font-size: 12.5px; }
+  .lq-sebar .lq-sumbu { font-size: 13px; }
+  /* Tipografi isi naik satu tingkat pada layar 6 inci. */
+  .lq-tanya { font-size: 1.05rem; }
+  .lq-kutipan { font-size: 1.02rem; line-height: 1.75; }
+  #lq-abc-teks { font-size: .85rem; }
+  .lq-catatan { font-size: .9rem; }
+  /* Tombol navigasi soal selebar jempol, dua per baris. */
+  .lq-tombol-nav { gap: .5rem !important; }
+  .lq-tombol-nav > button { min-height: 44px; min-width: 0 !important;
+                            flex: 1 1 calc(50% - .5rem) !important; }
+  #lq-audio .abcjs-tempo-wrapper { white-space: nowrap; }
+  #lq-audio .abcjs-tempo-wrapper > span { display: none; }
+  #lq-audio .abcjs-midi-tempo { width: 2.9rem; }
+  #lq-audio .abcjs-midi-clock { padding: 0 .35rem; }
+  .gradio-container .main { padding-left: 14px !important;
+                            padding-right: 14px !important; }
+  #lq-kepala { padding: 1.05rem 0 .9rem; }
+  #lq-kepala .lq-lambang { width: 34px; height: 34px; flex: 0 0 34px;
+                           font-size: 1.2rem; }
+  #lq-kepala .lq-lambang::after { bottom: 8px; width: 12px; }
+  #lq-kepala h1 { font-size: 1.35rem; }
+  #lq-kepala .lq-sub { font-size: .87rem; margin-top: .4rem; }
+  #lq-kepala .lq-angka { grid-template-columns: repeat(3, 1fr);
+                         margin-top: .95rem; }
+  #lq-kepala .lq-angka > div { padding-right: .5rem; }
+  #lq-kepala .lq-angka dd { font-size: 1.02rem; }
+  #lq-kepala .lq-angka dt { font-size: .66rem; }
+}
+
+/* --- navigasi ikon untuk layar kecil --- */
+#lq-iconnav { display: none; }
+@media (max-width: 760px) {
+  .tab-wrapper.lq-nav-alih { display: none !important; }
+  .lq-navwrap { min-height: calc(58px + env(safe-area-inset-bottom)); }
+  #lq-iconnav.lq-siap { display: flex !important; position: fixed; left: 0;
+    right: 0; bottom: 0; z-index: 50;
+    background: var(--background-fill-primary);
+    border-top: 1px solid var(--border-color-primary);
+    padding-bottom: env(safe-area-inset-bottom); }
+  #lq-iconnav button { flex: 1 1 0; min-width: 0; display: flex;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; background: none; border: 0; cursor: pointer;
+    color: var(--body-text-color-subdued); font-size: 10px;
+    font-family: var(--font); min-height: 56px; padding: .4rem 0;
+    border-top: 2px solid transparent; }
+  #lq-iconnav button svg { width: 22px; height: 22px; flex: 0 0 auto; }
+  #lq-iconnav button.aktif { color: var(--primary-600); font-weight: 600;
+    border-top-color: var(--primary-600); }
+  .lq-kepalawrap { order: -2; }
+  .lq-navwrap.lq-atas { order: -1; min-height: 0; }
+  #lq-iconnav.lq-atas { position: static; padding-bottom: 0; border-top: 0;
+    margin-bottom: .5rem;
+    border-bottom: 1px solid var(--border-color-primary); }
+  #lq-iconnav.lq-atas button { border-top: 0;
+    border-bottom: 2px solid transparent; }
+  #lq-iconnav.lq-atas button.aktif { border-top-color: transparent;
+    border-bottom-color: var(--primary-600); }
+}
 """
 
 KEPALA = f"""
 <div id="lq-kepala">
   <div class="lq-merek">
-    <div class="lq-lambang">1</div>
-    <div>
-      <h1>LaguQA</h1>
-      <p class="lq-sub">Sejauh mana model bahasa mengenal lagu nasional dan
-      lagu daerah Indonesia</p>
-    </div>
+    <span class="lq-lambang">1</span>
+    <h1>LaguQA</h1>
   </div>
-  <div class="lq-angka">
-    <span><b>{ribuan(RINGKAS['lagu'])}</b> lagu</span>
-    <span><b>{ribuan(RINGKAS['soal'])}</b> soal pilihan ganda</span>
-    <span><b>{RINGKAS['kategori']}</b> kategori</span>
-    <span><b>{RINGKAS['pembanding']}</b> model pembanding</span>
-    <span><b>{RINGKAS['terverifikasi']}</b> notasi terverifikasi</span>
-  </div>
+  <p class="lq-sub">Sejauh mana model bahasa mengenal lagu nasional dan lagu
+  daerah Indonesia</p>
+  <dl class="lq-angka">
+    <div><dt>lagu</dt><dd>{ribuan(RINGKAS['lagu'])}</dd></div>
+    <div><dt>soal pilihan ganda</dt><dd>{ribuan(RINGKAS['soal'])}</dd></div>
+    <div><dt>kategori</dt><dd>{RINGKAS['kategori']}</dd></div>
+    <div><dt>model pembanding</dt><dd>{RINGKAS['pembanding']}</dd></div>
+    <div><dt>notasi terverifikasi</dt><dd>{RINGKAS['terverifikasi']}</dd></div>
+  </dl>
 </div>
 """
 
-with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
-    gr.HTML(KEPALA)
+# Bilah navigasi ikon untuk layar kecil. Disembunyikan di desktop lewat CSS
+# dan hanya diaktifkan JavaScript setelah kelima tombol tab bawaan terbukti
+# ada, sehingga kegagalan skrip tidak pernah menghilangkan navigasi.
+IKON_TOMBOL = [
+    ("Percakapan", "Percakapan",
+     '<path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1L3 20l1.1-5.1A8.5 8.5 0 1 1 21 11.5z"/>'),
+    ("Bandingkan jawaban", "Banding",
+     '<rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/>'),
+    ("Lagu", "Lagu",
+     '<path d="M9 18V5l10-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>'),
+    ("Soal", "Soal",
+     '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.5 2.5 0 1 1 3.6 2.3c-.8.4-1.1.8-1.1 1.7"/><path d="M12 17h.01"/>'),
+    ("Hasil", "Hasil",
+     '<path d="M6 20v-7"/><path d="M12 20V5"/><path d="M18 20v-4"/><path d="M3 20h18"/>'),
+]
 
-    with gr.Tab("Percakapan"):
+
+def ikon_nav() -> str:
+    bagian = ['<nav id="lq-iconnav" aria-label="Navigasi utama">']
+    for kunci, label, gambar in IKON_TOMBOL:
+        bagian.append(
+            f'<button type="button" data-tab="{kunci}" aria-label="{label}">'
+            f'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+            f'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" '
+            f'aria-hidden="true">{gambar}</svg><span>{label}</span></button>')
+    bagian.append("</nav>")
+    return "".join(bagian)
+
+with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
+    gr.HTML(KEPALA, elem_classes=["lq-kepalawrap"])
+
+    with gr.Tab("Percakapan", elem_id="lq-tab-cakap"):
         if model is None:
             gr.HTML(peringatan_model())
+        # Akordeonnya dibangun sendiri, bukan lewat additional_inputs_accordion.
+        # Komponen yang dibuat di dalam blok Tab sudah tergambar di tempatnya,
+        # sehingga ChatInterface tidak memindahkannya lagi: sliedernya muncul di
+        # atas dan akordeon bawaan itu tampil kosong.
+        with gr.Accordion("Pengaturan", open=False):
+            suhu = gr.Slider(0, 1.2, value=0.0, step=0.1, label="Temperature")
+            token = gr.Slider(64, 512, value=192, step=64,
+                              label="Panjang jawaban maksimum (token)")
         gr.ChatInterface(
             fn=jawab,
             chatbot=gr.Chatbot(label="Percakapan", height=420),
             textbox=gr.Textbox(placeholder="Tanyakan sesuatu tentang lagunya",
                                label="Pertanyaan", submit_btn="Kirim"),
-            additional_inputs=[
-                gr.Slider(0, 1.2, value=0.0, step=0.1, label="Temperature"),
-                gr.Slider(64, 512, value=192, step=64,
-                          label="Panjang jawaban maksimum (token)"),
-            ],
-            additional_inputs_accordion=gr.Accordion("Pengaturan", open=False),
+            additional_inputs=[suhu, token],
             examples=[["Siapa pencipta lagu Gugur Bunga?"],
                       ["Lagu Bungong Jeumpa berasal dari daerah mana?"],
                       ["Apa nada dasar lagu Indonesia Raya?"],
@@ -1102,7 +1343,7 @@ with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
             f'berakun, jadi jawaban yang panjang menghabiskannya lebih '
             f'cepat.</p></div>')
 
-    with gr.Tab("Bandingkan jawaban"):
+    with gr.Tab("Bandingkan jawaban", elem_id="lq-tab-banding"):
         gr.Markdown(
             "Satu pertanyaan, dijawab dua kali: sekali oleh Gemma yang belum "
             "dilatih, sekali oleh model hasil fine-tuning LaguQA. Keduanya "
@@ -1160,14 +1401,15 @@ with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
             'bukan mengukurnya. Angka yang terukur ada di tab Hasil, dihitung '
             'atas 1.200 soal.</p></div>')
 
-    with gr.Tab("Lagu") as tab_lagu:
+    with gr.Tab("Lagu", elem_id="lq-tab-lagu") as tab_lagu:
         with gr.Row():
-            cari = gr.Textbox(label="Cari", scale=2,
+            cari = gr.Textbox(label="Cari", scale=1,
                               placeholder="judul, pencipta, atau daerah asal")
+        with gr.Row():
             jenis = gr.Radio(["Semua", "Nasional", "Daerah"], value="Semua",
-                             label="Jenis", scale=2)
+                             label="Jenis", scale=1)
             urutan = gr.Radio([URUT_BUKU, URUT_ABJAD], value=URUT_BUKU,
-                              label="Urutan", scale=2)
+                              label="Urutan", scale=1)
         with gr.Row():
             pilih = gr.Dropdown(NAMA, value=NAMA[0], label="Lagu", scale=4,
                                 filterable=True)
@@ -1220,17 +1462,20 @@ with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
             f'pada berkas ABC-nya. Catatan hak untuk tiap lagu ada pada '
             f'berkas HAK-CIPTA.md di rilis datasetnya.</p></div>')
 
-    with gr.Tab("Soal"):
+    with gr.Tab("Soal", elem_id="lq-tab-soal"):
         with gr.Row():
             kategori = gr.Dropdown([SEMUA] + KATEGORI, value=SEMUA,
                                    label="Kategori", scale=4)
             nomor = gr.Number(value=1, precision=0, minimum=1,
                               maximum=len(SOAL), step=1, label="Soal ke-",
                               scale=2)
-            buka = gr.Button("Buka", scale=0)
-            mundur = gr.Button("Sebelumnya", scale=0)
-            maju = gr.Button("Berikutnya", scale=0)
-            lagi = gr.Button("Acak", scale=0)
+        # Tombol navigasi di baris sendiri supaya tetap selebar jempol pada
+        # layar kecil; empat tombol scale=0 sebaris dropdown pasti terjepit.
+        with gr.Row(elem_classes=["lq-tombol-nav"]):
+            buka = gr.Button("Buka", scale=1)
+            mundur = gr.Button("Sebelumnya", scale=1)
+            maju = gr.Button("Berikutnya", scale=1)
+            lagi = gr.Button("Acak", scale=1)
         pertanyaan = gr.HTML()
         opsi = gr.Radio([], label="Pilihan jawaban")
         jawabi = gr.Button("Periksa jawaban", variant="primary")
@@ -1267,7 +1512,7 @@ with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
             f'<code>nada_tertinggi</code> dapat dikerjakan dari notasi yang '
             f'tertera di soal tanpa mengenal lagunya.</p></div>')
 
-    with gr.Tab("Hasil"):
+    with gr.Tab("Hasil", elem_id="lq-tab-hasil"):
         pilihan = gr.Dropdown(TABEL, value=TABEL[0], label="Tabel")
         isi = gr.HTML()
         sumber = gr.Markdown()
@@ -1320,6 +1565,8 @@ with gr.Blocks(title="LaguQA", analytics_enabled=False) as demo:
             'berkas, dan kode yang sama pada dua GPU itu berbeda jawaban pada '
             '1,5 sampai 2 persen soal, tetapi akurasinya hanya berbeda 0,0 '
             'sampai 0,4 poin.</p></div>')
+
+    gr.HTML(ikon_nav(), padding=False, elem_classes=["lq-navwrap"])
 
 if __name__ == "__main__":
     # Sejak Gradio 6, tema, CSS, dan isi head diberikan di launch(),
